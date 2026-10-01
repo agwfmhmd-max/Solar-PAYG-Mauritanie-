@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS (lecture de l'équipe et des résultats de l'enquête depuis la base de données) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -112,6 +114,14 @@
             <a href="#module-financials" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs sm:text-sm font-medium text-slate-200 transition flex items-center gap-2">
                 <i class="fa-solid fa-chart-line text-purple-400"></i>
                 <span data-key="navModule4">4. Modèle Financier Dynamique (VAN/TRI)</span>
+            </a>
+            <a href="#module-survey" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs sm:text-sm font-medium text-slate-200 transition flex items-center gap-2">
+                <i class="fa-solid fa-square-poll-vertical text-cyan-400"></i>
+                <span data-key="navModule5">5. Résultats de l'Enquête</span>
+            </a>
+            <a href="#module-team" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg text-xs sm:text-sm font-medium text-slate-200 transition flex items-center gap-2">
+                <i class="fa-solid fa-users text-rose-400"></i>
+                <span data-key="navModule6">6. Équipe du Projet</span>
             </a>
         </nav>
 
@@ -569,6 +579,58 @@
             </div>
         </section>
 
+        <!-- MODULE 5 : Résultats de l'enquête (base de données Supabase) -->
+        <section id="module-survey" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-cyan-500/20 text-cyan-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase border border-cyan-500/30" data-key="mod5Tag">Module 5</span>
+                        <h3 class="text-xl font-bold text-white" data-key="mod5Title">Résultats de l'Enquête Terrain</h3>
+                    </div>
+                    <p class="text-xs sm:text-sm text-slate-400 mt-1" data-key="mod5Desc">
+                        Résultats agrégés et anonymes du questionnaire Solar PAYG, lus en direct depuis la base de données
+                    </p>
+                </div>
+                <button type="button" onclick="loadSurveyResults()" id="btnRefreshSurvey" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-medium transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrows-rotate" id="surveyRefreshIcon"></i>
+                    <span data-key="btnRefresh">Actualiser</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-center shadow">
+                    <span class="text-[11px] text-slate-400 block mb-1" data-key="surveyKpiParticipants">Participants ayant terminé :</span>
+                    <span id="surveyKpiParticipants" class="text-2xl font-extrabold text-cyan-400 font-mono">—</span>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-center shadow">
+                    <span class="text-[11px] text-slate-400 block mb-1" data-key="surveyKpiQuestions">Questions du sondage :</span>
+                    <span id="surveyKpiQuestions" class="text-2xl font-extrabold text-amber-400 font-mono">—</span>
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl text-center shadow">
+                    <span class="text-[11px] text-slate-400 block mb-1" data-key="surveyKpiUpdated">Dernière mise à jour :</span>
+                    <span id="surveyKpiUpdated" class="text-2xl font-extrabold text-emerald-400 font-mono">—</span>
+                </div>
+            </div>
+
+            <div id="surveyStatusMsg" class="hidden"></div>
+            <div id="surveyResultsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- SECTION ÉQUIPE : membres de l'équipe depuis la base de données Supabase -->
+        <section id="module-team" class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-7 shadow-xl space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="bg-rose-500/20 text-rose-400 text-xs px-2.5 py-1 rounded-md font-bold uppercase border border-rose-500/30" data-key="teamTag">Équipe</span>
+                    <h3 class="text-xl font-bold text-white" data-key="teamTitle">Une recherche portée par une équipe engagée</h3>
+                </div>
+                <p class="text-xs sm:text-sm text-slate-400 mt-1" data-key="teamDesc">
+                    Découvrez les membres qui contribuent à cette étude académique.
+                </p>
+            </div>
+            <div id="teamStatusMsg" class="hidden"></div>
+            <div id="teamGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"></div>
+        </section>
+
     </main>
 
     <!-- Pied de page strict avec l'année 2027 -->
@@ -662,6 +724,32 @@
                 noteDesc: "L'association du Mauri-Score et du système de verrouillage IoT permet de maintenir le taux d'impayés en dessous de 3%. En intégrant une subvention d'amorçage (Scénario Recommandé), la rentabilité financière (TRI > 35%) garantit la viabilité à long terme de l'entreprise.",
                 statusTitle: "Statut d'Évaluation :",
                 statusDesc: "Projet bancable à haut impact social et économique pour la Mauritanie.",
+                navModule5: "5. Résultats de l'Enquête",
+                navModule6: "6. Équipe du Projet",
+                mod5Tag: "Module 5",
+                mod5Title: "Résultats de l'Enquête Terrain",
+                mod5Desc: "Résultats agrégés et anonymes du questionnaire Solar PAYG, lus en direct depuis la base de données",
+                btnRefresh: "Actualiser",
+                surveyKpiParticipants: "Participants ayant terminé :",
+                surveyKpiQuestions: "Questions du sondage :",
+                surveyKpiUpdated: "Dernière mise à jour :",
+                surveyLoading: "Chargement des résultats depuis la base de données…",
+                surveyNotConfigured: "Connexion à la base de données non configurée. Renseignez SUPABASE_URL et SUPABASE_ANON_KEY dans APP_CONFIG (début du script de ce fichier).",
+                surveyError: "Impossible de charger les résultats pour le moment.",
+                surveyNoSurvey: "Le sondage Solar PAYG est introuvable ou inactif dans la base de données.",
+                surveyNoQuestions: "Aucune question active n'est encore configurée pour ce sondage.",
+                surveyNoAnswers: "Aucune réponse enregistrée pour le moment.",
+                surveyFreeText: "Question à réponse libre : les réponses ne sont pas affichées publiquement.",
+                surveyResponses: "réponses",
+                surveyQuestionLabel: "Question",
+                teamTag: "Équipe",
+                teamTitle: "Une recherche portée par une équipe engagée",
+                teamDesc: "Découvrez les membres qui contribuent à cette étude académique.",
+                teamLoading: "Chargement des membres de l'équipe…",
+                teamNotConfigured: "Connexion à la base de données non configurée. Renseignez SUPABASE_URL et SUPABASE_ANON_KEY dans APP_CONFIG (début du script de ce fichier).",
+                teamError: "Impossible de charger les membres de l'équipe pour le moment.",
+                teamEmpty: "Aucun membre n'est encore configuré.",
+                teamFallbackRole: "Membre de l'équipe de recherche",
                 footerCopyright: "© 2027 Solar PAYG Mauritanie — Tous droits réservés.",
                 footerSub: "Prototype interactif d'étude de faisabilité d'entreprise pour le département Banque & Assurance."
             },
@@ -743,6 +831,32 @@
                 noteDesc: "يسمح دمج Mauri-Score مع تقنية الإغلاق الآلي IoT بالحفاظ على نسبة التعثر دون 3%. وعند دمج منحة التأسيس (السيناريو المدعوم)، فإن الربحية المالية العالية (TRI > 35%) تضمن استدامة المشروع ونجاحه الاستثماري.",
                 statusTitle: "حالة التقييم الاستثماري:",
                 statusDesc: "مشروع قابل للتمويل البنكي ذو أثر اقتصادي واجتماعي مرتفع لموريتانيا.",
+                navModule5: "5. نتائج الاستبيان",
+                navModule6: "6. فريق المشروع",
+                mod5Tag: "الوحدة 5",
+                mod5Title: "نتائج الاستبيان الميداني",
+                mod5Desc: "نتائج مجمعة ومجهولة الهوية لاستبيان Solar PAYG، تُقرأ مباشرة من قاعدة البيانات",
+                btnRefresh: "تحديث",
+                surveyKpiParticipants: "المشاركون الذين أكملوا الاستبيان:",
+                surveyKpiQuestions: "عدد أسئلة الاستبيان:",
+                surveyKpiUpdated: "آخر تحديث:",
+                surveyLoading: "جارٍ تحميل النتائج من قاعدة البيانات…",
+                surveyNotConfigured: "لم يتم إعداد الاتصال بقاعدة البيانات. أدخل SUPABASE_URL و SUPABASE_ANON_KEY في APP_CONFIG (بداية سكربت هذا الملف).",
+                surveyError: "تعذّر تحميل النتائج حاليًا.",
+                surveyNoSurvey: "استبيان Solar PAYG غير موجود أو غير نشط في قاعدة البيانات.",
+                surveyNoQuestions: "لا توجد أسئلة نشطة مُهيأة لهذا الاستبيان بعد.",
+                surveyNoAnswers: "لا توجد إجابات مسجلة حتى الآن.",
+                surveyFreeText: "سؤال بإجابة حرة: لا تُعرض الإجابات للعموم.",
+                surveyResponses: "إجابة",
+                surveyQuestionLabel: "السؤال",
+                teamTag: "الفريق",
+                teamTitle: "بحث علمي يقوده فريق ملتزم",
+                teamDesc: "تعرّفوا على أعضاء الفريق المساهمين في هذه الدراسة الأكاديمية.",
+                teamLoading: "جارٍ تحميل أعضاء الفريق…",
+                teamNotConfigured: "لم يتم إعداد الاتصال بقاعدة البيانات. أدخل SUPABASE_URL و SUPABASE_ANON_KEY في APP_CONFIG (بداية سكربت هذا الملف).",
+                teamError: "تعذّر تحميل أعضاء الفريق حاليًا.",
+                teamEmpty: "لا يوجد أعضاء مهيؤون بعد.",
+                teamFallbackRole: "عضو في فريق البحث",
                 footerCopyright: "© 2027 Solar PAYG Mauritanie — جميع الحقوق محفوظة.",
                 footerSub: "نموذج أولي وتطبيقي لدراسة جدوى المشاريع - تخصص البنوك والتأمين."
             }
@@ -776,7 +890,7 @@
                 { val: "1", label: "الحوض الشرقي (منطقة رعوية واسعة)" },
                 { val: "1", label: "الحوض الغربي (منطقة زراعية ورعوية)" },
                 { val: "2", label: "إنشيري (منطقة تعدينية وشبه صحراوية)" },
-                { val: "3", label: "نواكشott الغربية (مركز تجاري وحضري)", selected: true },
+                { val: "3", label: "نواكشوط الغربية (مركز تجاري وحضري)", selected: true },
                 { val: "3", label: "نواكشوط الشمالية (محيط حضري كَثِيف)" },
                 { val: "2", label: "نواكشوط الجنوبية (منطقة شبه حضرية)" },
                 { val: "1", label: "تكانت (منطقة واحات)" },
@@ -896,6 +1010,10 @@
             updateMauriScore();
             updatePricing();
             recalculateFinancialModel();
+
+            // Re-render database-driven sections in the new language
+            renderTeam();
+            renderSurveyResults();
         }
 
         function populateSelect(id, list) {
@@ -1178,10 +1296,292 @@
             vanChartInstance.update();
         }
 
+        // =====================================================================
+        // Base de données Supabase : membres de l'équipe + résultats de l'enquête
+        // (lecture seule, clé anonyme publique uniquement — jamais la clé service_role)
+        // =====================================================================
+        const APP_CONFIG = {
+            SUPABASE_URL: "https://xposdpygdmivhgcbisjl.supabase.co",       // ex. https://xxxxxxxx.supabase.co  (même projet que la plateforme d'enquête)
+            SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhwb3NkcHlnZG1pdmhnY2Jpc2psIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY1NzAxMzIsImV4cCI6MjEwMjE0NjEzMn0.dAdRduHZbxGCsoFr6rC72nf8LIYJkZxFNNKNpwv9hqo",  // clé « anon / public » du projet Supabase
+            SURVEY_SLUG: "solar-payg-mauritanie-2027"
+        };
+
+        const RESULT_COLORS = ['#3b82f6', '#f59e0b', '#a855f7', '#06b6d4', '#ec4899', '#84cc16'];
+        const TOP_COLOR = '#10b981';
+
+        const dbState = {
+            team: { status: 'loading', data: [] },
+            survey: { status: 'loading', participants: null, questions: [], rows: [], updatedAt: null }
+        };
+
+        let supabaseClient = null;
+        function getSupabase() {
+            if (supabaseClient) return supabaseClient;
+            if (!APP_CONFIG.SUPABASE_URL || !APP_CONFIG.SUPABASE_ANON_KEY) return null;
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
+            supabaseClient = window.supabase.createClient(APP_CONFIG.SUPABASE_URL, APP_CONFIG.SUPABASE_ANON_KEY);
+            return supabaseClient;
+        }
+
+        function tr(key) { return i18n[currentLang][key] || key; }
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Même nettoyage visuel que la plateforme d'enquête (retire ? et ؟ des intitulés)
+        function cleanVisibleText(value) {
+            return String(value || '').replace(/[?؟]/g, '').replace(/\s{2,}/g, ' ').trim();
+        }
+
+        function showStatus(el, tone, iconClass, text) {
+            const tones = {
+                info: 'bg-slate-950 border-slate-800 text-slate-300',
+                warn: 'bg-amber-500/10 border-amber-500/30 text-amber-300',
+                error: 'bg-red-500/10 border-red-500/30 text-red-300'
+            };
+            el.className = 'p-4 border rounded-xl text-xs sm:text-sm flex items-start gap-3 ' + tones[tone];
+            el.innerHTML = '<i class="fa-solid ' + iconClass + ' mt-0.5"></i><span>' + escapeHtml(text) + '</span>';
+        }
+
+        function hideStatus(el) { el.className = 'hidden'; el.innerHTML = ''; }
+
+        // ---------- Équipe ----------
+        async function loadTeam() {
+            dbState.team.status = 'loading';
+            renderTeam();
+            const client = getSupabase();
+            if (!client) { dbState.team.status = 'not_configured'; renderTeam(); return; }
+            try {
+                const { data, error } = await client
+                    .from('team_members')
+                    .select('id, name_ar, name_fr, role_ar, role_fr, image_url, sort_order, active')
+                    .eq('active', true)
+                    .order('sort_order', { ascending: true });
+                if (error) throw error;
+                dbState.team.data = data || [];
+                dbState.team.status = 'ok';
+            } catch (err) {
+                console.error('[team-members-load]', err);
+                dbState.team.status = 'error';
+            }
+            renderTeam();
+        }
+
+        function renderTeam() {
+            const grid = document.getElementById('teamGrid');
+            const msg = document.getElementById('teamStatusMsg');
+            if (!grid || !msg) return;
+            grid.innerHTML = '';
+            const st = dbState.team.status;
+
+            if (st === 'loading') { showStatus(msg, 'info', 'fa-circle-notch fa-spin', tr('teamLoading')); return; }
+            if (st === 'not_configured') { showStatus(msg, 'warn', 'fa-plug-circle-exclamation', tr('teamNotConfigured')); return; }
+            if (st === 'error') { showStatus(msg, 'error', 'fa-triangle-exclamation', tr('teamError')); return; }
+            const members = dbState.team.data.filter(m => m.active !== false);
+            if (!members.length) { showStatus(msg, 'info', 'fa-users-slash', tr('teamEmpty')); return; }
+            hideStatus(msg);
+
+            members.forEach((m, index) => {
+                const name = currentLang === 'ar' ? (m.name_ar || m.name_fr) : (m.name_fr || m.name_ar);
+                const role = (currentLang === 'ar' ? (m.role_ar || m.role_fr) : (m.role_fr || m.role_ar)) || tr('teamFallbackRole');
+
+                const card = document.createElement('article');
+                card.className = 'relative bg-slate-950 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-5 text-center transition shadow';
+
+                const num = document.createElement('span');
+                num.className = 'absolute top-3 ltr:right-3 rtl:left-3 text-[11px] font-mono text-slate-600';
+                num.textContent = String(index + 1).padStart(2, '0');
+                card.appendChild(num);
+
+                const avatarWrap = document.createElement('div');
+                avatarWrap.className = 'mx-auto w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 via-emerald-500 to-blue-600 p-0.5 mb-3';
+                const avatarInner = document.createElement('div');
+                avatarInner.className = 'w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden';
+                const placeholder = () => {
+                    avatarInner.innerHTML = '<i class="fa-solid fa-user text-slate-500 text-2xl"></i>';
+                };
+                if (m.image_url) {
+                    const img = document.createElement('img');
+                    img.src = m.image_url;
+                    img.alt = name || '';
+                    img.loading = 'lazy';
+                    img.className = 'w-full h-full object-cover';
+                    img.onerror = placeholder;
+                    avatarInner.appendChild(img);
+                } else {
+                    placeholder();
+                }
+                avatarWrap.appendChild(avatarInner);
+                card.appendChild(avatarWrap);
+
+                const h = document.createElement('h4');
+                h.className = 'text-sm font-bold text-white';
+                h.textContent = name || '—';
+                card.appendChild(h);
+
+                const p = document.createElement('p');
+                p.className = 'text-xs text-amber-400/90 mt-1';
+                p.textContent = role;
+                card.appendChild(p);
+
+                grid.appendChild(card);
+            });
+        }
+
+        // ---------- Résultats de l'enquête ----------
+        async function loadSurveyResults() {
+            const icon = document.getElementById('surveyRefreshIcon');
+            if (icon) icon.classList.add('fa-spin');
+            const first = dbState.survey.status !== 'ok';
+            if (first) { dbState.survey.status = 'loading'; renderSurveyResults(); }
+
+            const client = getSupabase();
+            if (!client) {
+                dbState.survey.status = 'not_configured';
+                renderSurveyResults();
+                if (icon) icon.classList.remove('fa-spin');
+                return;
+            }
+            try {
+                const { data: surveyRow, error: surveyError } = await client
+                    .from('surveys').select('id, slug, title_ar, title_fr, active')
+                    .eq('slug', APP_CONFIG.SURVEY_SLUG).eq('active', true).maybeSingle();
+                if (surveyError) throw surveyError;
+                if (!surveyRow) { dbState.survey.status = 'no_survey'; renderSurveyResults(); return; }
+
+                const [questionsRes, resultsRes, countRes] = await Promise.all([
+                    client.from('survey_questions')
+                        .select('id, question_ar, question_fr, question_type, sort_order, survey_options(id, label_ar, label_fr, value, sort_order)')
+                        .eq('survey_id', surveyRow.id).eq('active', true).order('sort_order', { ascending: true }),
+                    client.from('public_survey_results').select('*').eq('survey_id', surveyRow.id),
+                    client.from('public_survey_participant_counts').select('total_participants').eq('survey_id', surveyRow.id).maybeSingle()
+                ]);
+                if (questionsRes.error) throw questionsRes.error;
+                if (resultsRes.error) throw resultsRes.error;
+                if (countRes.error) console.warn('[survey-participant-count]', countRes.error);
+
+                dbState.survey.questions = (questionsRes.data || []).map(q => ({
+                    ...q,
+                    options: (q.survey_options || []).slice().sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+                }));
+                dbState.survey.rows = resultsRes.data || [];
+                dbState.survey.participants = countRes.error ? null : ((countRes.data && countRes.data.total_participants) || 0);
+                dbState.survey.updatedAt = new Date();
+                dbState.survey.status = 'ok';
+            } catch (err) {
+                console.error('[survey-results-load]', err);
+                dbState.survey.status = 'error';
+            } finally {
+                if (icon) icon.classList.remove('fa-spin');
+            }
+            renderSurveyResults();
+        }
+
+        function renderSurveyResults() {
+            const grid = document.getElementById('surveyResultsGrid');
+            const msg = document.getElementById('surveyStatusMsg');
+            const kpiP = document.getElementById('surveyKpiParticipants');
+            const kpiQ = document.getElementById('surveyKpiQuestions');
+            const kpiU = document.getElementById('surveyKpiUpdated');
+            if (!grid || !msg) return;
+            grid.innerHTML = '';
+            const s = dbState.survey;
+
+            if (s.status === 'ok') {
+                kpiP.textContent = s.participants == null ? '—' : Number(s.participants).toLocaleString('fr-FR');
+                kpiQ.textContent = s.questions.length.toLocaleString('fr-FR');
+                kpiU.textContent = s.updatedAt
+                    ? s.updatedAt.toLocaleTimeString(currentLang === 'ar' ? 'ar' : 'fr-FR', { hour: '2-digit', minute: '2-digit' })
+                    : '—';
+            } else {
+                kpiP.textContent = '—'; kpiQ.textContent = '—'; kpiU.textContent = '—';
+            }
+
+            if (s.status === 'loading') { showStatus(msg, 'info', 'fa-circle-notch fa-spin', tr('surveyLoading')); return; }
+            if (s.status === 'not_configured') { showStatus(msg, 'warn', 'fa-plug-circle-exclamation', tr('surveyNotConfigured')); return; }
+            if (s.status === 'no_survey') { showStatus(msg, 'warn', 'fa-circle-question', tr('surveyNoSurvey')); return; }
+            if (s.status === 'error') { showStatus(msg, 'error', 'fa-triangle-exclamation', tr('surveyError')); return; }
+            if (!s.questions.length) { showStatus(msg, 'info', 'fa-clipboard-list', tr('surveyNoQuestions')); return; }
+            if (!s.participants) showStatus(msg, 'info', 'fa-inbox', tr('surveyNoAnswers')); else hideStatus(msg);
+
+            const labelOf = (o) => cleanVisibleText(currentLang === 'ar' ? o.label_ar : o.label_fr);
+
+            s.questions.forEach((q, qIndex) => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3';
+
+                const head = document.createElement('div');
+                head.className = 'flex items-start gap-3';
+                const badge = document.createElement('span');
+                badge.className = 'shrink-0 w-8 h-8 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 text-xs font-bold font-mono flex items-center justify-center';
+                badge.textContent = String(qIndex + 1).padStart(2, '0');
+                const title = document.createElement('h5');
+                title.className = 'text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed';
+                title.textContent = cleanVisibleText(currentLang === 'ar' ? q.question_ar : q.question_fr);
+                head.appendChild(badge); head.appendChild(title);
+                card.appendChild(head);
+
+                const isChoice = q.question_type === 'single_choice' || q.question_type === 'multiple_choice';
+                if (!isChoice) {
+                    const note = document.createElement('p');
+                    note.className = 'text-[11px] text-slate-500 italic';
+                    note.textContent = tr('surveyFreeText');
+                    card.appendChild(note);
+                    grid.appendChild(card);
+                    return;
+                }
+
+                // Join aggregated rows with the question options (keeps option order, shows 0 % options)
+                const rows = s.rows.filter(r => r.question_id === q.id);
+                const used = new Set();
+                const items = q.options.map(o => {
+                    const row = rows.find(r => (r.option_id && r.option_id === o.id) ||
+                        String(r.option_label_fr || '').trim() === String(o.label_fr || '').trim());
+                    if (row) used.add(row);
+                    return { name: labelOf(o), count: Number(row ? row.response_count : 0) || 0, pct: row && row.percentage != null ? Number(row.percentage) : 0 };
+                });
+                rows.filter(r => !used.has(r)).forEach(r => items.push({
+                    name: cleanVisibleText(currentLang === 'ar' ? r.option_label_ar : r.option_label_fr),
+                    count: Number(r.response_count) || 0,
+                    pct: r.percentage != null ? Number(r.percentage) : 0
+                }));
+
+                const maxCount = Math.max(...items.map(i => i.count), 0);
+                const list = document.createElement('div');
+                list.className = 'space-y-2.5';
+                items.forEach((item, idx) => {
+                    const isTop = maxCount > 0 && item.count === maxCount;
+                    const color = isTop ? TOP_COLOR : RESULT_COLORS[idx % RESULT_COLORS.length];
+                    const width = maxCount > 0 ? Math.max(item.count > 0 ? 3 : 0, (item.count / maxCount) * 100) : 0;
+                    const row = document.createElement('div');
+                    row.innerHTML =
+                        '<div class="flex justify-between items-baseline gap-3 text-[11px] sm:text-xs mb-1">' +
+                            '<span class="' + (isTop ? 'text-emerald-300 font-semibold' : 'text-slate-300') + '">' + escapeHtml(item.name || '—') + '</span>' +
+                            '<span class="font-mono text-slate-200 whitespace-nowrap"><strong>' + escapeHtml(Math.round(item.pct * 10) / 10) + '%</strong>' +
+                            ' <span class="text-slate-500">(' + item.count.toLocaleString('fr-FR') + ' ' + escapeHtml(tr('surveyResponses')) + ')</span></span>' +
+                        '</div>' +
+                        '<div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">' +
+                            '<div class="h-full rounded-full transition-all duration-700" style="width:' + width + '%;background:' + color + '"></div>' +
+                        '</div>';
+                    list.appendChild(row);
+                });
+                card.appendChild(list);
+                grid.appendChild(card);
+            });
+        }
+
+        // Actualisation automatique discrète toutes les 60 s (onglet visible uniquement)
+        setInterval(() => { if (!document.hidden && dbState.survey.status === 'ok') loadSurveyResults(); }, 60000);
+
         window.onload = function() {
             applyLanguage();
             initFinancialChart();
             recalculateFinancialModel();
+            loadTeam();
+            loadSurveyResults();
         };
     </script>
 </body>
