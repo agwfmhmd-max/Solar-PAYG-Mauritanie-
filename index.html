@@ -43,6 +43,81 @@
         }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+
+        /* Light mode: visual layer only; application logic and existing components remain unchanged. */
+        body.light-mode {
+            background-color: #f3f7fb !important;
+            color: #172033 !important;
+        }
+        body.light-mode ::-webkit-scrollbar-track { background: #e8eef5; }
+        body.light-mode ::-webkit-scrollbar-thumb { background: #a8b6c7; }
+        body.light-mode header,
+        body.light-mode footer { background-color: rgba(255,255,255,.94) !important; border-color: #d7e0ea !important; }
+        body.light-mode header .bg-slate-900,
+        body.light-mode header .bg-slate-900\/90 { background-color: #ffffff !important; }
+        body.light-mode .bg-slate-950 { background-color: #ffffff !important; }
+        body.light-mode .bg-slate-900 { background-color: #f8fbfe !important; }
+        body.light-mode .bg-slate-800,
+        body.light-mode .bg-slate-800\/80 { background-color: #eaf0f6 !important; }
+        body.light-mode .bg-slate-700 { background-color: #dbe5ee !important; }
+        body.light-mode .bg-slate-900\/90 { background-color: rgba(255,255,255,.94) !important; }
+        body.light-mode .bg-gradient-to-r.from-slate-900,
+        body.light-mode .bg-gradient-to-r.via-slate-800,
+        body.light-mode .bg-gradient-to-r.to-slate-900 { background-image: linear-gradient(to right,#ffffff,#eef4f9,#ffffff) !important; }
+        body.light-mode [class*="from-slate-900"] { --tw-gradient-from: #ffffff !important; }
+        body.light-mode [class*="via-slate-800"] { --tw-gradient-via: #eef4f9 !important; }
+        body.light-mode [class*="to-slate-900"] { --tw-gradient-to: #ffffff !important; }
+        body.light-mode .border-slate-800,
+        body.light-mode .border-slate-800\/80,
+        body.light-mode .border-slate-700,
+        body.light-mode .border-slate-700\/60,
+        body.light-mode .border-slate-700\/70 { border-color: #d5e0ea !important; }
+        body.light-mode .text-white { color: #142033 !important; }
+        body.light-mode .text-slate-100 { color: #1d2b3d !important; }
+        body.light-mode .text-slate-200 { color: #304258 !important; }
+        body.light-mode .text-slate-300 { color: #43566b !important; }
+        body.light-mode .text-slate-400 { color: #60748a !important; }
+        body.light-mode .text-slate-500 { color: #70849a !important; }
+        body.light-mode .text-slate-600 { color: #8193a6 !important; }
+        body.light-mode input,
+        body.light-mode select,
+        body.light-mode textarea { background-color: #ffffff !important; color: #1d2b3d !important; border-color: #c8d5e2 !important; }
+        body.light-mode input::placeholder,
+        body.light-mode textarea::placeholder { color: #8292a4 !important; }
+        body.light-mode .shadow-xl,
+        body.light-mode .shadow-lg,
+        body.light-mode .shadow { box-shadow: 0 10px 28px rgba(44,66,90,.10) !important; }
+        body.light-mode .hover\:bg-slate-700:hover { background-color: #dce7f0 !important; }
+        body.light-mode .hover\:bg-slate-800:hover { background-color: #e3edf5 !important; }
+        body.light-mode .bg-slate-950 .bg-slate-900 { background-color: #f4f8fb !important; }
+        body.light-mode .bg-slate-950 .bg-slate-800 { background-color: #eaf1f6 !important; }
+        body.light-mode .bg-slate-950 .text-slate-400 { color: #63778c !important; }
+        body.light-mode .bg-slate-950 .text-slate-300 { color: #40536a !important; }
+        body.light-mode .bg-amber-500\/20 { background-color: rgba(245,158,11,.14) !important; }
+        body.light-mode .bg-emerald-500\/20 { background-color: rgba(16,185,129,.14) !important; }
+        body.light-mode .bg-blue-500\/20 { background-color: rgba(59,130,246,.13) !important; }
+        body.light-mode .bg-cyan-500\/20 { background-color: rgba(6,182,212,.13) !important; }
+        body.light-mode .bg-purple-500\/20 { background-color: rgba(168,85,247,.13) !important; }
+        body.light-mode .bg-rose-500\/20 { background-color: rgba(244,63,94,.12) !important; }
+        body.light-mode .bg-amber-500\/10 { background-color: rgba(245,158,11,.10) !important; }
+        body.light-mode .bg-emerald-500\/10 { background-color: rgba(16,185,129,.10) !important; }
+        body.light-mode .bg-cyan-950\/20 { background-color: rgba(8,145,178,.08) !important; }
+        body.light-mode .bg-amber-500\/20, body.light-mode .bg-emerald-500\/20,
+        body.light-mode .bg-blue-500\/20, body.light-mode .bg-cyan-500\/20,
+        body.light-mode .bg-purple-500\/20, body.light-mode .bg-rose-500\/20 { color: inherit; }
+        body.light-mode .text-amber-400 { color: #b77908 !important; }
+        body.light-mode .text-emerald-400 { color: #087f5b !important; }
+        body.light-mode .text-blue-400 { color: #1d63b8 !important; }
+        body.light-mode .text-cyan-400 { color: #087f98 !important; }
+        body.light-mode .text-purple-400 { color: #7a3db0 !important; }
+        body.light-mode .text-rose-400 { color: #be3152 !important; }
+        body.light-mode .text-amber-300 { color: #9a6507 !important; }
+        body.light-mode .text-emerald-300 { color: #087052 !important; }
+        body.light-mode .text-cyan-300 { color: #08758a !important; }
+        body.light-mode .text-slate-950 { color: #ffffff !important; }
+        body.light-mode #themeToggle { background-color: #eaf0f6 !important; color: #334155 !important; border-color: #c8d5e2 !important; }
+        body.light-mode .fa-sun { color: #b77908 !important; }
+        @media (prefers-color-scheme: light) { }
     </style>
 </head>
 <body id="bodyTag" class="font-fr bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-emerald-500 selection:text-slate-900">
@@ -61,13 +136,18 @@
                         <span>Solar PAYG Mauritanie</span>
                         <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-mono">2027</span>
                     </h1>
-                    <p class="text-xs text-slate-400" data-key="headerSubtitle">FinTech, Micro-assurance & Financement Solaire au Fil de l'Eau</p>
+                    <p class="text-xs text-slate-400" data-key="headerSubtitle">Financement PAYG de l’Énergie Solaire : Scoring de Crédit, Micro-assurance et Paiement Mobile</p>
                 </div>
             </div>
 
             <!-- Boutons & Indicateurs -->
             <div class="flex items-center space-x-3 sm:space-x-4 rtl:space-x-reverse">
                 <!-- Bouton de commutation de langue -->
+                <button type="button" id="themeToggle" onclick="toggleTheme()" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 font-bold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center gap-2" aria-label="Activer le mode clair" title="Activer le mode clair">
+                    <i id="themeToggleIcon" class="fa-solid fa-sun"></i>
+                    <span id="themeToggleLabel">Mode clair</span>
+                </button>
+
                 <button onclick="toggleLanguage()" class="bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-md transition flex items-center gap-2">
                     <i class="fa-solid fa-globe"></i>
                     <span id="langBtnLabel">العربية</span>
@@ -295,6 +375,18 @@
                         </div>
                     </div>
 
+                    <div class="p-3.5 bg-slate-950 border border-slate-700 rounded-xl space-y-3">
+                        <div class="text-xs font-bold text-cyan-400 uppercase">Construction du prix (hypothèses modifiables)</div>
+                        <div class="grid grid-cols-2 gap-2 text-[11px]">
+                            <label>Installation <input id="costInstallation" type="number" value="15000" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                            <label>IoT / paiement <input id="costIoT" type="number" value="5000" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                            <label>Financement (%) <input id="costFinanceRate" type="number" value="18" step="0.5" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                            <label>Opérations / mois <input id="costOpex" type="number" value="500" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                            <label>Marge (%) <input id="costMargin" type="number" value="15" step="1" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                            <label>Assurance (%) <input id="costInsuranceRate" type="number" value="2.5" step="0.1" class="w-full bg-slate-900 border border-slate-700 rounded p-1.5 text-white" oninput="updatePricing()"></label>
+                        </div>
+                        <p id="pricingFormula" class="text-[10px] text-slate-400 leading-relaxed">Source : hypothèse / estimation — aucune API de paiement réel n’est connectée.</p>
+                    </div>
                     <!-- Toggle Micro-assurance -->
                     <div class="p-3.5 bg-gradient-to-r from-emerald-950/40 to-slate-800/60 border border-emerald-500/30 rounded-xl">
                         <div class="flex items-center justify-between">
@@ -454,6 +546,7 @@
                         </div>
                     </div>
 
+                    <div class="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg text-[11px] text-amber-200">Simulation / Prototype — aucune API de paiement mobile réelle n’est connectée.</div>
                     <button id="payBtn" onclick="simulatePayment()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs sm:text-sm shadow-lg transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-bolt"></i>
                         <span id="payBtnText" data-key="btnPayAction">Payer & Réactiver l'Équipement Instantanément</span>
@@ -612,6 +705,11 @@
                 </div>
             </div>
 
+            <div class="bg-cyan-950/20 border border-cyan-500/20 rounded-xl p-4 space-y-3">
+                <div class="flex items-center justify-between gap-3"><h4 class="text-sm font-bold text-cyan-300">Synthèse de l’étude de marché</h4><span class="text-[10px] text-slate-400">Résultats de l’échantillon — pas une généralisation</span></div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center"><div><span class="block text-[10px] text-slate-400">Intérêt PAYG</span><b id="marketPaygInterest" class="text-lg text-emerald-400">—</b></div><div><span class="block text-[10px] text-slate-400">Intention d’achat</span><b id="marketPurchaseIntent" class="text-lg text-emerald-400">—</b></div><div><span class="block text-[10px] text-slate-400">Mensualité moyenne estimée (tranches)</span><b id="marketMedianPayment" class="text-lg text-amber-400">—</b></div><div><span class="block text-[10px] text-slate-400">Assurance</span><b id="marketInsurance" class="text-lg text-blue-400">—</b></div></div>
+                <div id="marketDistributions" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"></div>
+            </div>
             <div id="surveyStatusMsg" class="hidden"></div>
             <div id="surveyResultsGrid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
         </section>
@@ -647,7 +745,7 @@
 
         const i18n = {
             fr: {
-                headerSubtitle: "FinTech, Micro-assurance & Financement Solaire au Fil de l'Eau",
+                headerSubtitle: "Financement PAYG de l’Énergie Solaire : Scoring de Crédit, Micro-assurance et Paiement Mobile",
                 headerInsolvencyLabel: "Taux d'impayés cible:",
                 academicTitle: "Étude de faisabilité d’une entreprise de financement PAYG de l’énergie solaire en Mauritanie",
                 academicSubtitle: "Modèle d'évaluation dynamique : Intégration du scoring de crédit algorithmique (Mauri-Score), de la micro-assurance et du paiement mobile.",
@@ -951,6 +1049,35 @@
             ]
         };
 
+        function updateThemeControl() {
+            const light = document.body.classList.contains('light-mode');
+            const label = document.getElementById('themeToggleLabel');
+            const icon = document.getElementById('themeToggleIcon');
+            const button = document.getElementById('themeToggle');
+            const arabic = currentLang === 'ar';
+            if (label) label.innerText = light ? (arabic ? 'الوضع الداكن' : 'Mode sombre') : (arabic ? 'الوضع الفاتح' : 'Mode clair');
+            if (icon) icon.className = light ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+            if (button) {
+                const text = light ? (arabic ? 'تفعيل الوضع الداكن' : 'Activer le mode sombre') : (arabic ? 'تفعيل الوضع الفاتح' : 'Activer le mode clair');
+                button.setAttribute('aria-label', text);
+                button.setAttribute('title', text);
+            }
+        }
+        function setTheme(mode) {
+            const light = mode === 'light';
+            document.body.classList.toggle('light-mode', light);
+            try { window.localStorage.setItem('solar_payg_theme', light ? 'light' : 'dark'); } catch (error) { console.warn('[theme-storage]', error); }
+            updateThemeControl();
+        }
+        function toggleTheme() {
+            setTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
+        }
+        function restoreTheme() {
+            let saved = 'dark';
+            try { saved = window.localStorage.getItem('solar_payg_theme') || 'dark'; } catch (error) { console.warn('[theme-storage-read]', error); }
+            setTheme(saved === 'light' ? 'light' : 'dark');
+        }
+
         function toggleLanguage() {
             currentLang = currentLang === 'fr' ? 'ar' : 'fr';
             applyLanguage();
@@ -982,6 +1109,7 @@
             });
 
             // Populate selects
+            updateThemeControl();
             populateSelect('wilayaInput', wilayasData[currentLang]);
             populateSelect('mobileVolInput', optionsMobileVol[currentLang]);
             populateSelect('assetsInput', optionsAssets[currentLang]);
@@ -1097,54 +1225,41 @@
         function updatePricing() {
             const checkedRadio = document.querySelector('input[name="productKit"]:checked');
             const selectedKit = checkedRadio ? checkedRadio.value : 'kit1';
-            const kitPrice = productPrices[selectedKit];
-            const tenureMonths = parseInt(document.getElementById('tenureInput').value);
+            const kitCost = productPrices[selectedKit] || 80000;
+            const tenureMonths = parseInt(document.getElementById('tenureInput').value) || 12;
             const freq = document.getElementById('freqInput').value;
-            const includeInsurance = document.getElementById('insuranceToggle').checked;
-
-            const acomptePctStr = document.getElementById('resAcomptePct').innerText;
-            const acomptePct = parseInt(acomptePctStr) / 100;
-
-            const acompteVal = Math.round(kitPrice * acomptePct);
-            const remainingCapital = kitPrice - acompteVal;
-
-            const interestVal = Math.round(remainingCapital * (0.18 * (tenureMonths / 12)));
-            const insuranceVal = includeInsurance ? Math.round(kitPrice * 0.025) : 0;
-
-            const totalFinancedCost = remainingCapital + interestVal + insuranceVal;
-
-            let totalPeriods = tenureMonths;
-            if (freq === 'daily') totalPeriods = tenureMonths * 30;
-            if (freq === 'weekly') totalPeriods = tenureMonths * 4.33;
-            if (freq === 'monthly') totalPeriods = tenureMonths;
-
-            const installmentVal = Math.round(totalFinancedCost / totalPeriods);
-
+            const insuranceRate = (parseFloat(document.getElementById('costInsuranceRate')?.value) || 0) / 100;
+            const install = parseFloat(document.getElementById('costInstallation')?.value) || 0;
+            const iot = parseFloat(document.getElementById('costIoT')?.value) || 0;
+            const financeRate = (parseFloat(document.getElementById('costFinanceRate')?.value) || 0) / 100;
+            const opexMonthly = parseFloat(document.getElementById('costOpex')?.value) || 0;
+            const marginRate = (parseFloat(document.getElementById('costMargin')?.value) || 0) / 100;
+            const acomptePct = (parseInt(document.getElementById('resAcomptePct').innerText) || 10) / 100;
+            const base = kitCost + install + iot;
+            const acompteVal = Math.round(base * acomptePct);
+            const financedBase = base - acompteVal;
+            const financeCost = Math.round(financedBase * financeRate * (tenureMonths / 12));
+            const insuranceVal = Math.round(base * insuranceRate * (tenureMonths / 12));
+            const operations = Math.round(opexMonthly * tenureMonths);
+            const preMargin = financedBase + financeCost + insuranceVal + operations;
+            const marginVal = Math.round(preMargin * marginRate);
+            const totalFinancedCost = preMargin + marginVal;
+            let totalPeriods = freq === 'daily' ? tenureMonths * 30 : freq === 'weekly' ? tenureMonths * 4.33 : tenureMonths;
+            const installmentVal = Math.round(totalFinancedCost / Math.max(1,totalPeriods));
+            const totalCost = acompteVal + totalFinancedCost;
             document.getElementById('outAcompte').innerText = acompteVal.toLocaleString('fr-FR') + ' MRU';
             document.getElementById('outInstallment').innerText = installmentVal.toLocaleString('fr-FR') + ' MRU';
-            document.getElementById('outTotalCost').innerText = (acompteVal + totalFinancedCost).toLocaleString('fr-FR') + ' MRU';
-
-            const freqLabels = {
-                daily: currentLang === 'ar' ? 'القسط اليومي :' : 'Échéance Quotidienne :',
-                weekly: currentLang === 'ar' ? 'القسط الأسبوعي :' : 'Échéance Hebdomadaire :',
-                monthly: currentLang === 'ar' ? 'القسط الشهري :' : 'Échéance Mensuelle :'
-            };
-            document.getElementById('freqLabelDisplay').innerText = freqLabels[freq];
-
-            const totalCostSum = remainingCapital + interestVal + insuranceVal;
-            const pCap = Math.round((remainingCapital / totalCostSum) * 100);
-            const pInt = Math.round((interestVal / totalCostSum) * 100);
-            const pIns = 100 - pCap - pInt;
-
-            document.getElementById('barPrincipal').style.width = pCap + '%';
-            document.getElementById('barInterest').style.width = pInt + '%';
-            document.getElementById('barInsurance').style.width = Math.max(0, pIns) + '%';
-
-            document.getElementById('lblCapVal').innerText = remainingCapital.toLocaleString('fr-FR') + ' MRU';
-            document.getElementById('lblIntVal').innerText = interestVal.toLocaleString('fr-FR') + ' MRU';
-            document.getElementById('lblInsVal').innerText = insuranceVal.toLocaleString('fr-FR') + ' MRU';
+            document.getElementById('outTotalCost').innerText = totalCost.toLocaleString('fr-FR') + ' MRU';
+            const freqLabels = { daily: currentLang === 'ar' ? 'القسط اليومي :' : 'Échéance Quotidienne :', weekly: currentLang === 'ar' ? 'القسط الأسبوعي :' : 'Échéance Hebdomadaire :', monthly: currentLang === 'ar' ? 'القسط الشهري :' : 'Échéance Mensuelle :' };
+            document.getElementById('freqLabelDisplay').innerText = freqLabels[freq] || freqLabels.monthly;
+            const parts = { capital: financedBase, interest: financeCost, insurance: insuranceVal, operations, margin: marginVal };
+            const sum = Math.max(1, Object.values(parts).reduce((a,b)=>a+b,0));
+            document.getElementById('barPrincipal').style.width = (parts.capital/sum*100)+'%'; document.getElementById('barInterest').style.width=((parts.interest+parts.operations+parts.margin)/sum*100)+'%'; document.getElementById('barInsurance').style.width=(parts.insurance/sum*100)+'%';
+            document.getElementById('lblCapVal').innerText = financedBase.toLocaleString('fr-FR') + ' MRU'; document.getElementById('lblIntVal').innerText = (financeCost+operations+marginVal).toLocaleString('fr-FR') + ' MRU'; document.getElementById('lblInsVal').innerText = insuranceVal.toLocaleString('fr-FR') + ' MRU';
+            const formula=document.getElementById('pricingFormula'); if(formula) formula.innerText=`Prix total = kit ${kitCost.toLocaleString('fr-FR')} + installation ${install.toLocaleString('fr-FR')} + IoT ${iot.toLocaleString('fr-FR')} + financement ${financeCost.toLocaleString('fr-FR')} + assurance ${insuranceVal.toLocaleString('fr-FR')} + opérations ${operations.toLocaleString('fr-FR')} + marge ${marginVal.toLocaleString('fr-FR')}. Source : kit = estimation, autres paramètres = hypothèses.`;
+            const finPrice=document.getElementById('finKitPrice'); if(finPrice && !finPrice.matches(':focus')) finPrice.value=totalCost;
+            recalculateFinancialModel();
         }
-
         document.getElementById('tenureInput').addEventListener('change', updatePricing);
         document.getElementById('freqInput').addEventListener('change', updatePricing);
         document.getElementById('insuranceToggle').addEventListener('change', updatePricing);
@@ -1205,53 +1320,10 @@
         let vanChartInstance = null;
 
         function recalculateFinancialModel() {
-            const capex = parseFloat(document.getElementById('finCapex').value) || 0;
-            const grant = parseFloat(document.getElementById('finGrant').value) || 0;
-            const units = parseFloat(document.getElementById('finUnits').value) || 0;
-            const kitPrice = parseFloat(document.getElementById('finKitPrice').value) || 0;
-            const insolvencyRate = parseFloat(document.getElementById('finInsolvency').value) || 0;
-            const discountRate = (parseFloat(document.getElementById('finDiscountRate').value) || 10) / 100;
-            const marginPct = (parseFloat(document.getElementById('finMargin').value) || 20) / 100;
-            const opex = parseFloat(document.getElementById('finOpex').value) || 0;
-
-            document.getElementById('headerInsolvencyRate').innerText = insolvencyRate.toFixed(1) + '%';
-
-            const netEquity = Math.max(1000000, capex - grant);
-            const grossRevenue = units * kitPrice * marginPct;
-            const netRevenue = grossRevenue * (1 - (insolvencyRate / 100));
-            const netCashFlow = netRevenue - opex;
-
-            let van = -netEquity;
-            for (let t = 1; t <= 5; t++) {
-                van += netCashFlow / Math.pow(1 + discountRate, t);
-            }
-
-            let tri = 0.05;
-            for (let r = 0.05; r <= 1.0; r += 0.01) {
-                let tempVan = -netEquity;
-                for (let t = 1; t <= 5; t++) {
-                    tempVan += netCashFlow / Math.pow(1 + r, t);
-                }
-                if (tempVan <= 0) {
-                    tri = r;
-                    break;
-                }
-            }
-
-            const paybackYears = netCashFlow > 0 ? (netEquity / netCashFlow) : 9.9;
-            const unitMargin = kitPrice * marginPct * (1 - (insolvencyRate / 100));
-            const breakEvenUnits = unitMargin > 0 ? Math.round(opex / unitMargin) : 0;
-
-            document.getElementById('outVAN').innerText = (van >= 0 ? '+' : '') + (van / 1000000).toFixed(2) + ' M MRU';
-            document.getElementById('outVAN').className = van >= 0 ? 'text-lg sm:text-xl font-extrabold text-emerald-400 font-mono' : 'text-lg sm:text-xl font-extrabold text-red-400 font-mono';
-
-            document.getElementById('outTRI').innerText = (tri * 100).toFixed(1) + ' %';
-            document.getElementById('outPayback').innerText = paybackYears < 10 ? paybackYears.toFixed(1) + (currentLang === 'ar' ? ' أعوام' : ' Ans') : '> 10';
-            document.getElementById('outBreakEven').innerText = breakEvenUnits.toLocaleString('fr-FR') + (currentLang === 'ar' ? ' جهاز / سنة' : ' Kits / an');
-
-            updateChartValues(van / 1000000);
+            const capex=parseFloat(document.getElementById('finCapex').value)||0, grant=parseFloat(document.getElementById('finGrant').value)||0, units=parseFloat(document.getElementById('finUnits').value)||0, price=parseFloat(document.getElementById('finKitPrice').value)||0, badDebt=(parseFloat(document.getElementById('finInsolvency').value)||0)/100, discount=(parseFloat(document.getElementById('finDiscountRate').value)||10)/100, margin=(parseFloat(document.getElementById('finMargin').value)||0)/100, opex=parseFloat(document.getElementById('finOpex').value)||0;
+            document.getElementById('headerInsolvencyRate').innerText=(badDebt*100).toFixed(1)+'%'; const equity=Math.max(0,capex-grant); const revenue=units*price*(1-badDebt); const grossMargin=revenue*margin; const cash=grossMargin-opex; let van=-equity; for(let y=1;y<=5;y++) van+=cash/Math.pow(1+discount,y); let tri=0; for(let r=0;r<=2;r+=0.001){let npv=-equity;for(let y=1;y<=5;y++)npv+=cash/Math.pow(1+r,y);if(npv>=0){tri=r;break;}} const payback=cash>0?equity/cash:Infinity; const unitContribution=price*(1-badDebt)*margin; const breakEven=unitContribution>0?Math.ceil(opex/unitContribution):0;
+            document.getElementById('outVAN').innerText=(van>=0?'+':'')+(van/1e6).toFixed(2)+' M MRU'; document.getElementById('outVAN').className=van>=0?'text-lg sm:text-xl font-extrabold text-emerald-400 font-mono':'text-lg sm:text-xl font-extrabold text-red-400 font-mono'; document.getElementById('outTRI').innerText=(tri*100).toFixed(1)+' %'; document.getElementById('outPayback').innerText=Number.isFinite(payback)?payback.toFixed(1)+(currentLang==='ar'?' أعوام':' Ans'):'—'; document.getElementById('outBreakEven').innerText=breakEven.toLocaleString('fr-FR')+(currentLang==='ar'?' جهاز / سنة':' Kits / an'); updateChartValues(van/1e6);
         }
-
         function initFinancialChart() {
             const ctx = document.getElementById('vanChart').getContext('2d');
             vanChartInstance = new Chart(ctx, {
@@ -1432,6 +1504,12 @@
         }
 
         // ---------- Résultats de l'enquête ----------
+        function pctFor(rows, needles){ const r=rows.filter(x=>needles.some(n=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(n))); const total=r.reduce((s,x)=>s+Number(x.response_count||0),0); return total; }
+        function renderMarketHypothesis(rows, participants){
+            const total=Math.max(1,Number(participants)||0); const interest=pctFor(rows,['oui','peut_etre']); const purchase=pctFor(rows,['kit_eclairage','kit_familial','kit_productif']); const ins=pctFor(rows,['oui_si_prix','oui']);
+            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v}; set('marketPaygInterest',Math.round(interest/total*1000)/10+'%'); set('marketPurchaseIntent',Math.round(purchase/total*1000)/10+'%'); set('marketInsurance',Math.round(ins/total*1000)/10+'%'); const monthly=[['lt_1000',500],['1000_2000',1500],['2000_4000',3000],['gt_4000',5000]]; const monthlyN=monthly.reduce((s,[key])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0),0),0); const monthlySum=monthly.reduce((s,[key,val])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0)*val,0),0); const med=document.getElementById('marketMedianPayment'); if(med) med.textContent=monthlyN?Math.round(monthlySum/monthlyN).toLocaleString('fr-FR')+' MRU':'—';
+            const box=document.getElementById('marketDistributions'); if(!box)return; const groups=[['Prix mensuel acceptable',['lt_1000','1000_2000','2000_4000','gt_4000']],['Durée préférée',['6_mois','12_mois','18_mois','24_mois']],['Fréquence',['quotidienne','hebdomadaire','mensuelle','saisonniere']]]; box.innerHTML=groups.map(([title,vals])=>'<div><b class="text-slate-300">'+title+'</b>'+vals.map(v=>{const n=rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').includes(v)).reduce((s,x)=>s+Number(x.response_count||0),0);return '<div class="flex justify-between text-slate-400"><span>'+v+'</span><span>'+Math.round(n/total*1000)/10+'%</span></div>'}).join('')+'</div>').join('');
+        }
         async function loadSurveyResults() {
             const icon = document.getElementById('surveyRefreshIcon');
             if (icon) icon.classList.add('fa-spin');
@@ -1471,6 +1549,7 @@
                 dbState.survey.participants = countRes.error ? null : ((countRes.data && countRes.data.total_participants) || 0);
                 dbState.survey.updatedAt = new Date();
                 dbState.survey.status = 'ok';
+                renderMarketHypothesis(dbState.survey.rows, dbState.survey.participants);
             } catch (err) {
                 console.error('[survey-results-load]', err);
                 dbState.survey.status = 'error';
@@ -1577,6 +1656,7 @@
         setInterval(() => { if (!document.hidden && dbState.survey.status === 'ok') loadSurveyResults(); }, 60000);
 
         window.onload = function() {
+            restoreTheme();
             applyLanguage();
             initFinancialChart();
             recalculateFinancialModel();
