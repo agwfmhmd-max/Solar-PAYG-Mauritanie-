@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Export financier : Excel et PDF, utilisés uniquement lors d'une action utilisateur -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
     <!-- Supabase JS (lecture de l'équipe et des résultats de l'enquête depuis la base de données) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
@@ -393,7 +397,7 @@
                             <div class="flex items-center space-x-2 rtl:space-x-reverse">
                                 <i class="fa-solid fa-shield-cat text-emerald-400 text-lg"></i>
                                 <div>
-                                    <div class="text-xs font-bold text-white" data-key="insurTitle">Micro-assurance Intégrée (2.5%)</div>
+                                    <div id="insuranceTitle" class="text-xs font-bold text-white" data-key="insurTitle">Micro-assurance Intégrée</div>
                                     <div class="text-[11px] text-slate-400" data-key="insurDesc">Protection Vol, Tempêtes de sable & Casse</div>
                                 </div>
                             </div>
@@ -603,6 +607,11 @@
                     </div>
 
                     <div>
+                        <label class="block text-[11px] font-medium text-slate-300 mb-1">Taux d’assurance (%) :</label>
+                        <input type="number" id="finInsuranceRate" value="2.5" step="0.1" min="0" max="100" oninput="recalculateFinancialModel()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
+                    </div>
+
+                    <div>
                         <label class="block text-[11px] font-medium text-slate-300 mb-1" data-key="lblDiscount">Taux d'Actualisation (%) :</label>
                         <input type="number" id="finDiscountRate" value="10" step="0.5" oninput="recalculateFinancialModel()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-mono">
                     </div>
@@ -647,6 +656,20 @@
                 </div>
             </div>
 
+            <div class="bg-emerald-950/20 border border-emerald-500/25 rounded-xl p-4 space-y-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <h4 class="text-sm font-bold text-emerald-300">Exporter le rapport financier</h4>
+                        <p class="text-[11px] text-slate-400">Les valeurs exportées correspondent aux hypothèses et résultats affichés à l’instant de l’export.</p>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="exportFinancialExcel()" class="px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex items-center gap-2"><i class="fa-solid fa-file-excel"></i> Excel</button>
+                        <button type="button" onclick="exportFinancialPDF()" class="px-3 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-bold transition flex items-center gap-2"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                    </div>
+                </div>
+                <p id="exportStatus" class="text-[11px] text-slate-500" aria-live="polite"></p>
+            </div>
+
             <!-- Graphique & Notes -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl">
@@ -659,14 +682,14 @@
                 <div class="bg-slate-950 border border-slate-800 p-4 rounded-xl flex flex-col justify-between">
                     <div>
                         <h5 class="text-xs font-bold text-amber-400 mb-2" data-key="noteTitle">Note Synthétique pour le Jury d'Évaluation</h5>
-                        <p class="text-xs text-slate-400 leading-relaxed" data-key="noteDesc">
+                        <p id="dynamicFinancialNote" class="text-xs text-slate-400 leading-relaxed" data-key="noteDesc">
                             L'association du Mauri-Score et du système de verrouillage IoT permet de maintenir le taux d'impayés en dessous de 3%. En intégrant une subvention d'amorçage (Scénario Recommandé), la rentabilité financière (TRI &gt; 35%) garantit la viabilité à long terme de l'entreprise.
                         </p>
                     </div>
 
                     <div class="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 mt-4">
                         <i class="fa-solid fa-award mx-1.5"></i>
-                        <strong data-key="statusTitle">Statut d'Évaluation :</strong> <span data-key="statusDesc">Projet bancable à haut impact social et économique pour la Mauritanie.</span>
+                        <strong data-key="statusTitle">Statut d'Évaluation :</strong> <span id="dynamicEvaluationStatus" data-key="statusDesc">Projet bancable à haut impact social et économique pour la Mauritanie.</span>
                     </div>
                 </div>
             </div>
@@ -1319,10 +1342,94 @@
         // Logic Module 4 - Financial Model
         let vanChartInstance = null;
 
+        let marketHypothesis = { sampleSize: null, purchaseRate: null, monthlyPayment: null, source: 'Aucune donnée d’enquête chargée' };
+        function getFinancialInputs() {
+            const number = (id, fallback = 0) => {
+                const value = Number.parseFloat(document.getElementById(id)?.value);
+                return Number.isFinite(value) ? value : fallback;
+            };
+            return {
+                capex: number('finCapex'), grant: number('finGrant'), units: number('finUnits'),
+                price: number('finKitPrice'), badDebtPct: number('finInsolvency'),
+                insurancePct: number('finInsuranceRate', 2.5), discountPct: number('finDiscountRate', 10),
+                marginPct: number('finMargin'), opex: number('finOpex')
+            };
+        }
+        function calculateNPV(rate, equity, annualCash, years = 5) {
+            if (rate <= -1) return Number.NaN;
+            let npv = -equity;
+            for (let year = 1; year <= years; year += 1) npv += annualCash / Math.pow(1 + rate, year);
+            return npv;
+        }
+        function calculateIRR(equity, annualCash, years = 5) {
+            // Exact IRR for the model cash-flow series: [-equity, annualCash x years].
+            if (!(equity > 0) || !Number.isFinite(annualCash)) return null;
+            const npvLow = calculateNPV(-0.999999, equity, annualCash, years);
+            const npvHigh = calculateNPV(100, equity, annualCash, years);
+            if (!Number.isFinite(npvLow) || !Number.isFinite(npvHigh) || npvLow * npvHigh > 0) return null;
+            let low = -0.999999, high = 100;
+            for (let iteration = 0; iteration < 160; iteration += 1) {
+                const mid = (low + high) / 2;
+                const value = calculateNPV(mid, equity, annualCash, years);
+                if (!Number.isFinite(value)) { low = mid; continue; }
+                if (npvLow * value <= 0) high = mid; else low = mid;
+            }
+            return (low + high) / 2;
+        }
+        function formatPercent(value) { return value == null ? (currentLang === 'ar' ? 'غير قابل للحساب رياضيًا' : 'Non calculable mathématiquement') : (value * 100).toFixed(2) + ' %'; }
+        function updateDynamicFinancialNarrative(model) {
+            const note = document.getElementById('dynamicFinancialNote');
+            const status = document.getElementById('dynamicEvaluationStatus');
+            const source = marketHypothesis.sampleSize ? `Échantillon enquête : ${marketHypothesis.sampleSize} répondants. ` : 'Aucune réponse d’enquête disponible. ';
+            const irrText = formatPercent(model.irr);
+            const paybackText = model.payback == null ? 'non atteint avec le cash-flow annuel actuel' : `${model.payback.toFixed(2)} an(s)`;
+            const resultText = model.van >= 0 ? 'VAN positive' : 'VAN négative';
+            if (note) note.innerText = `${source}Avec les hypothèses actuelles : ${resultText}, TRI ${irrText}, récupération ${paybackText}, assurance ${model.input.insurancePct.toFixed(2)} %. Les valeurs non issues de l’enquête restent des hypothèses modifiables.`;
+            if (status) status.innerText = model.van >= 0 && model.irr != null ? 'Faisabilité favorable selon les hypothèses affichées et les données d’échantillon disponibles.' : 'Faisabilité à renforcer : ajuster les hypothèses ou compléter les données d’enquête.';
+        }
+        let latestFinancialModel = null;
         function recalculateFinancialModel() {
-            const capex=parseFloat(document.getElementById('finCapex').value)||0, grant=parseFloat(document.getElementById('finGrant').value)||0, units=parseFloat(document.getElementById('finUnits').value)||0, price=parseFloat(document.getElementById('finKitPrice').value)||0, badDebt=(parseFloat(document.getElementById('finInsolvency').value)||0)/100, discount=(parseFloat(document.getElementById('finDiscountRate').value)||10)/100, margin=(parseFloat(document.getElementById('finMargin').value)||0)/100, opex=parseFloat(document.getElementById('finOpex').value)||0;
-            document.getElementById('headerInsolvencyRate').innerText=(badDebt*100).toFixed(1)+'%'; const equity=Math.max(0,capex-grant); const revenue=units*price*(1-badDebt); const grossMargin=revenue*margin; const cash=grossMargin-opex; let van=-equity; for(let y=1;y<=5;y++) van+=cash/Math.pow(1+discount,y); let tri=0; for(let r=0;r<=2;r+=0.001){let npv=-equity;for(let y=1;y<=5;y++)npv+=cash/Math.pow(1+r,y);if(npv>=0){tri=r;break;}} const payback=cash>0?equity/cash:Infinity; const unitContribution=price*(1-badDebt)*margin; const breakEven=unitContribution>0?Math.ceil(opex/unitContribution):0;
-            document.getElementById('outVAN').innerText=(van>=0?'+':'')+(van/1e6).toFixed(2)+' M MRU'; document.getElementById('outVAN').className=van>=0?'text-lg sm:text-xl font-extrabold text-emerald-400 font-mono':'text-lg sm:text-xl font-extrabold text-red-400 font-mono'; document.getElementById('outTRI').innerText=(tri*100).toFixed(1)+' %'; document.getElementById('outPayback').innerText=Number.isFinite(payback)?payback.toFixed(1)+(currentLang==='ar'?' أعوام':' Ans'):'—'; document.getElementById('outBreakEven').innerText=breakEven.toLocaleString('fr-FR')+(currentLang==='ar'?' جهاز / سنة':' Kits / an'); updateChartValues(van/1e6);
+            const input = getFinancialInputs();
+            const equity = Math.max(0, input.capex - input.grant);
+            const badDebt = Math.min(1, Math.max(0, input.badDebtPct / 100));
+            const insuranceRate = Math.max(0, input.insurancePct / 100);
+            const discount = Math.max(-0.99, input.discountPct / 100);
+            const margin = Math.max(0, input.marginPct / 100);
+            const revenue = input.units * input.price * (1 - badDebt);
+            const insuranceCost = input.units * input.price * insuranceRate;
+            const grossMargin = revenue * margin;
+            const cash = grossMargin - insuranceCost - input.opex;
+            const van = calculateNPV(discount, equity, cash);
+            const irr = calculateIRR(equity, cash);
+            const payback = cash > 0 && equity > 0 ? equity / cash : null;
+            const unitContribution = input.price * ((1 - badDebt) * margin - insuranceRate);
+            const breakEven = unitContribution > 0 ? Math.ceil(input.opex / unitContribution) : 0;
+            const header = document.getElementById('headerInsolvencyRate');
+            if (header) header.innerText = input.badDebtPct.toFixed(2) + '%';
+            const insuranceTitle = document.getElementById('insuranceTitle');
+            if (insuranceTitle) insuranceTitle.innerText = currentLang === 'ar' ? `التأمين الأصغر المدمج (${input.insurancePct.toFixed(2)}%)` : `Micro-assurance intégrée (${input.insurancePct.toFixed(2)}%)`;
+            const vanEl = document.getElementById('outVAN');
+            vanEl.innerText = (van >= 0 ? '+' : '') + (van / 1e6).toFixed(2) + ' M MRU';
+            vanEl.className = van >= 0 ? 'text-lg sm:text-xl font-extrabold text-emerald-400 font-mono' : 'text-lg sm:text-xl font-extrabold text-red-400 font-mono';
+            document.getElementById('outTRI').innerText = formatPercent(irr);
+            document.getElementById('outPayback').innerText = payback == null ? (currentLang === 'ar' ? 'لم يتحقق بعد' : 'Non atteint') : payback.toFixed(2) + (currentLang === 'ar' ? ' أعوام' : ' Ans');
+            document.getElementById('outBreakEven').innerText = breakEven.toLocaleString('fr-FR') + (currentLang === 'ar' ? ' جهاز / سنة' : ' Kits / an');
+            latestFinancialModel = { input, equity, badDebt, insuranceRate, insuranceCost, discount, margin, revenue, grossMargin, cash, van, irr, payback, breakEven, calculatedAt: new Date() };
+            updateChartValues(modelScenarioValues(latestFinancialModel));
+            updateDynamicFinancialNarrative(latestFinancialModel);
+            return latestFinancialModel;
+        }
+        function modelScenarioValues(model) {
+            const base = model.input;
+            const make = (factor, debtDelta, grantFactor = 1) => {
+                const units = base.units * factor;
+                const debt = Math.min(1, Math.max(0, model.badDebt + debtDelta));
+                const revenue = units * base.price * (1 - debt);
+                const cash = revenue * model.margin - units * base.price * model.insuranceRate - base.opex;
+                const equity = Math.max(0, base.capex - base.grant * grantFactor);
+                return calculateNPV(model.discount, equity, cash) / 1e6;
+            };
+            return [make(.75, .02, 0), make(1, 0, 1), make(1.25, -.01, 1.15)];
         }
         function initFinancialChart() {
             const ctx = document.getElementById('vanChart').getContext('2d');
@@ -1361,11 +1468,65 @@
             });
         }
 
-        function updateChartValues(dynamicVan) {
+        function updateChartValues(values) {
             if (!vanChartInstance) return;
-            vanChartInstance.data.labels = currentLang === 'ar' ? ['السيناريو الأساسي', 'السيناريو المتفائل', 'السيناريو المدعوم'] : ['Scénario 1 (Base)', 'Scénario 2 (Optimiste)', 'Scénario 3 (Subventionné)'];
-            vanChartInstance.data.datasets[0].data[2] = parseFloat(dynamicVan.toFixed(2));
+            vanChartInstance.data.labels = currentLang === 'ar' ? ['السيناريو الحذر', 'السيناريو المركزي', 'السيناريو الديناميكي'] : ['Prudent', 'Central', 'Dynamique'];
+            const numbers = Array.isArray(values) ? values : [0, 0, Number(values) || 0];
+            vanChartInstance.data.datasets[0].data = numbers.map(value => Number(Number(value).toFixed(2)));
             vanChartInstance.update();
+        }
+        function setExportStatus(message, error = false) {
+            const el = document.getElementById('exportStatus');
+            if (el) { el.innerText = message; el.className = 'text-[11px] ' + (error ? 'text-red-400' : 'text-emerald-400'); }
+        }
+        function financialRows() {
+            const model = latestFinancialModel || recalculateFinancialModel();
+            const i = model.input;
+            return [
+                ['Date de génération', model.calculatedAt.toLocaleString('fr-FR')],
+                ['Investissement initial CAPEX (MRU)', i.capex], ['Subvention / Don (MRU)', i.grant],
+                ['Clients / kits par an', i.units], ['Prix moyen du kit (MRU)', i.price],
+                ['Taux d’impayés (%)', i.badDebtPct], ['Taux d’assurance (%)', i.insurancePct], ['Taux d’actualisation (%)', i.discountPct],
+                ['Marge brute (%)', i.marginPct], ['Charges fixes OPEX / an (MRU)', i.opex],
+                ['Capitaux nets investis (MRU)', model.equity], ['Chiffre d’affaires net annuel (MRU)', model.revenue],
+                ['Marge brute annuelle (MRU)', model.grossMargin], ['Cash-flow annuel (MRU)', model.cash],
+                ['VAN sur 5 ans (MRU)', Math.round(model.van)], ['TRI sur 5 ans (%)', model.irr == null ? (currentLang === 'ar' ? 'غير قابل للحساب رياضيًا' : 'Non calculable mathématiquement') : +(model.irr * 100).toFixed(2)],
+                ['Payback (années)', model.payback == null ? (currentLang === 'ar' ? 'لم يتحقق بعد' : 'Non atteint') : +model.payback.toFixed(2)],
+                ['Seuil de rentabilité (kits/an)', model.breakEven]
+            ];
+        }
+        function exportFinancialExcel() {
+            try {
+                const rows = financialRows();
+                if (!window.XLSX) throw new Error('Bibliothèque Excel indisponible');
+                const sheet = window.XLSX.utils.aoa_to_sheet([['Rapport financier — Solar PAYG Mauritanie'], ['Indicateur', 'Valeur'], ...rows]);
+                sheet['!cols'] = [{ wch: 42 }, { wch: 24 }];
+                const workbook = window.XLSX.utils.book_new();
+                window.XLSX.utils.book_append_sheet(workbook, sheet, 'Rapport financier');
+                window.XLSX.writeFile(workbook, 'rapport-financier-solar-payg.xlsx');
+                setExportStatus('Rapport Excel téléchargé avec succès.');
+            } catch (error) { console.error('[financial-excel-export]', error); setExportStatus('Échec de l’export Excel.', true); }
+        }
+        function exportFinancialPDF() {
+            try {
+                const jsPDF = window.jspdf && window.jspdf.jsPDF;
+                if (!jsPDF) throw new Error('Bibliothèque PDF indisponible');
+                const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                doc.setFontSize(16); doc.text('Rapport financier — Solar PAYG Mauritanie', 14, 18);
+                doc.setFontSize(9); doc.setTextColor(90); doc.text('Hypothèses et résultats du modèle au moment de l’export', 14, 25);
+                const body = financialRows().map(row => [String(row[0]), String(row[1])]);
+                doc.autoTable({ startY: 32, head: [['Indicateur', 'Valeur']], body, theme: 'grid', styles: { fontSize: 8, cellPadding: 2 }, headStyles: { fillColor: [5, 150, 105] }, columnStyles: { 0: { cellWidth: 105 }, 1: { cellWidth: 70 } } });
+                doc.setFontSize(8); doc.setTextColor(100); doc.text('TRI = N/D lorsque les flux ne permettent pas d’obtenir un rendement interne positif sur 5 ans.', 14, 285);
+                doc.save('rapport-financier-solar-payg.pdf');
+                setExportStatus('Rapport PDF téléchargé avec succès.');
+            } catch (error) { console.error('[financial-pdf-export]', error); setExportStatus('Échec de l’export PDF.', true); }
+        }
+        // Force a single live calculation path for every financial input, including keyboard edits.
+        function bindFinancialInputs() {
+            ['finCapex','finGrant','finUnits','finKitPrice','finInsolvency','finInsuranceRate','finDiscountRate','finMargin','finOpex'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) element.addEventListener('input', recalculateFinancialModel);
+            });
         }
 
         // =====================================================================
@@ -1507,8 +1668,18 @@
         function pctFor(rows, needles){ const r=rows.filter(x=>needles.some(n=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(n))); const total=r.reduce((s,x)=>s+Number(x.response_count||0),0); return total; }
         function renderMarketHypothesis(rows, participants){
             const total=Math.max(1,Number(participants)||0); const interest=pctFor(rows,['oui','peut_etre']); const purchase=pctFor(rows,['kit_eclairage','kit_familial','kit_productif']); const ins=pctFor(rows,['oui_si_prix','oui']);
-            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v}; set('marketPaygInterest',Math.round(interest/total*1000)/10+'%'); set('marketPurchaseIntent',Math.round(purchase/total*1000)/10+'%'); set('marketInsurance',Math.round(ins/total*1000)/10+'%'); const monthly=[['lt_1000',500],['1000_2000',1500],['2000_4000',3000],['gt_4000',5000]]; const monthlyN=monthly.reduce((s,[key])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0),0),0); const monthlySum=monthly.reduce((s,[key,val])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0)*val,0),0); const med=document.getElementById('marketMedianPayment'); if(med) med.textContent=monthlyN?Math.round(monthlySum/monthlyN).toLocaleString('fr-FR')+' MRU':'—';
+            const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v}; set('marketPaygInterest',Math.round(interest/total*1000)/10+'%'); set('marketPurchaseIntent',Math.round(purchase/total*1000)/10+'%'); set('marketInsurance',Math.round(ins/total*1000)/10+'%'); applySurveyMarketHypothesis(participants, Math.round(purchase/total*1000)/10, null); const monthly=[['lt_1000',500],['1000_2000',1500],['2000_4000',3000],['gt_4000',5000]]; const monthlyN=monthly.reduce((s,[key])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0),0),0); const monthlySum=monthly.reduce((s,[key,val])=>s+rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').toLowerCase().includes(key)).reduce((a,x)=>a+Number(x.response_count||0)*val,0),0); const med=document.getElementById('marketMedianPayment'); if(med) med.textContent=monthlyN?Math.round(monthlySum/monthlyN).toLocaleString('fr-FR')+' MRU':'—';
             const box=document.getElementById('marketDistributions'); if(!box)return; const groups=[['Prix mensuel acceptable',['lt_1000','1000_2000','2000_4000','gt_4000']],['Durée préférée',['6_mois','12_mois','18_mois','24_mois']],['Fréquence',['quotidienne','hebdomadaire','mensuelle','saisonniere']]]; box.innerHTML=groups.map(([title,vals])=>'<div><b class="text-slate-300">'+title+'</b>'+vals.map(v=>{const n=rows.filter(x=>String(x.option_value||x.option_label_fr||x.option_label_ar||'').includes(v)).reduce((s,x)=>s+Number(x.response_count||0),0);return '<div class="flex justify-between text-slate-400"><span>'+v+'</span><span>'+Math.round(n/total*1000)/10+'%</span></div>'}).join('')+'</div>').join('');
+        }
+        function applySurveyMarketHypothesis(participants, purchaseRate, monthlyPayment) {
+            marketHypothesis = { sampleSize: Number(participants) || 0, purchaseRate: Number(purchaseRate) || 0, monthlyPayment: Number(monthlyPayment) || null, source: 'Donnée réelle de l’enquête' };
+            const unitsInput = document.getElementById('finUnits');
+            if (unitsInput && Number(participants) > 0) {
+                // The sample is used transparently as the current validated market base; scaling remains editable.
+                unitsInput.value = Math.max(1, Math.round(Number(participants) * (Number(purchaseRate) / 100 || 1)));
+                unitsInput.dataset.source = 'survey';
+            }
+            recalculateFinancialModel();
         }
         async function loadSurveyResults() {
             const icon = document.getElementById('surveyRefreshIcon');
@@ -1659,6 +1830,7 @@
             restoreTheme();
             applyLanguage();
             initFinancialChart();
+            bindFinancialInputs();
             recalculateFinancialModel();
             loadTeam();
             loadSurveyResults();
